@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb:11
+    container_name: nextcloud-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      - MYSQL_ROOT_PASSWORD=W0mq!guyr2t        # <-- keep your real root pwd
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=W0mq!guys3l             # <-- keep your real app pwd
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - internal
+
+  app:
+    image: nextcloud:29-apache
+    container_name: nextcloud-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - MYSQL_PASSWORD=W0mq!guys3l             # must match above
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_HOST=db
+      - APACHE_DISABLE_REWRITE_IP=1
+    volumes:
+      - ./data:/var/www/html
+    networks:
+      - internal
+      - web
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.nextcloud.rule=Host(`cloud.knoxor.com`)"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls.certresolver=le"
+
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+       # 👇 NEW: tell Traefik which Docker network/IP to use
+      - "traefik.docker.network=web"
+networks:
+  internal:
+    driver: bridge
+  web:
+    external: true

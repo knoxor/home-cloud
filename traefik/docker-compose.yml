@@ -1,0 +1,66 @@
+name: traefik
+
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: always
+
+    command:
+      # --- Providers ---
+      - --providers.docker=true
+      - --providers.docker.exposedByDefault=false
+
+      # --- EntryPoints ---
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --log.level=INFO
+
+      # HTTP -> HTTPS redirect
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+
+      # Increase timeouts for large uploads (important for Immich) :contentReference[oaicite:0]{index=0}
+      - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s
+      - --entrypoints.websecure.transport.respondingTimeouts.idleTimeout=600s
+      - --entrypoints.websecure.transport.respondingTimeouts.writeTimeout=600s
+
+      # --- ACME / Let's Encrypt ---
+      - --certificatesresolvers.le.acme.email=paul@knoxor.com
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+
+      # --- Dashboard (optional) ---
+      - --api.dashboard=true
+      - --api.insecure=false
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+    networks:
+      - web
+
+    labels:
+      # enable Traefik for itself (optional dashboard)
+      - "traefik.enable=true"
+#      - "traefik.http.routers.traefik.rule=Host(`traefik.knoxor.com`)"
+#      - "traefik.http.routers.traefik.entrypoints=websecure"
+#      - "traefik.http.routers.traefik.tls.certresolver=le"
+#      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      # Immich_server setup
+#      - "traefik.http.routers.immich.rule=Host(`photos.knoxor.com`)"
+#      - "traefik.http.routers.immich.tls.certresolver=le"
+#      - "traefik.http.routers.immich.entrypoints=websecure"
+#      - "traefik.http.services.immich.loadbalancer.server.port=2283"
+#      - "traefik.docker.network=web"
+
+
+networks:
+  web:
+    external: true
