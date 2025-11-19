@@ -5,7 +5,8 @@ services:
     image: traefik:v3.1
     container_name: traefik
     restart: always
-
+    env_file:
+      - .env
     command:
       # --- Providers ---
       - --providers.docker=true
@@ -26,7 +27,7 @@ services:
       - --entrypoints.websecure.transport.respondingTimeouts.writeTimeout=600s
 
       # --- ACME / Let's Encrypt ---
-      - --certificatesresolvers.le.acme.email=myemail@mydomain.com
+      - --certificatesresolvers.le.acme.email=${MY_EMAIL_ADDRESS}
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.le.acme.httpchallenge=true
       - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web

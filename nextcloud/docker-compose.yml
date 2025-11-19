@@ -6,11 +6,13 @@ services:
     container_name: nextcloud-db
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    env_file:
+      - .env
     environment:
-      - MYSQL_ROOT_PASSWORD=myrootpwd        # <-- keep your real root pwd
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PWD}        # <-- keep your real root pwd
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
-      - MYSQL_PASSWORD=mysqlpwd             # <-- keep your real app pwd
+      - MYSQL_PASSWORD=${DB_PWD}             # <-- keep your real app pwd
     volumes:
       - ./db:/var/lib/mysql
     networks:
@@ -22,8 +24,10 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    env_file:
+      - .env
     environment:
-      - MYSQL_PASSWORD=mysqlpwd             # must match above
+      - MYSQL_PASSWORD=${DB_PWD}             # must match above
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_HOST=db
