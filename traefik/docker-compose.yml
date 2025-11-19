@@ -26,7 +26,7 @@ services:
       - --entrypoints.websecure.transport.respondingTimeouts.writeTimeout=600s
 
       # --- ACME / Let's Encrypt ---
-      - --certificatesresolvers.le.acme.email=paul@knoxor.com
+      - --certificatesresolvers.le.acme.email=myemail@mydomain.com
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.le.acme.httpchallenge=true
       - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
@@ -49,16 +49,10 @@ services:
     labels:
       # enable Traefik for itself (optional dashboard)
       - "traefik.enable=true"
-#      - "traefik.http.routers.traefik.rule=Host(`traefik.knoxor.com`)"
+#      - "traefik.http.routers.traefik.rule=Host(`traefik.mydomain.com`)"
 #      - "traefik.http.routers.traefik.entrypoints=websecure"
 #      - "traefik.http.routers.traefik.tls.certresolver=le"
 #      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-      # Immich_server setup
-#      - "traefik.http.routers.immich.rule=Host(`photos.knoxor.com`)"
-#      - "traefik.http.routers.immich.tls.certresolver=le"
-#      - "traefik.http.routers.immich.entrypoints=websecure"
-#      - "traefik.http.services.immich.loadbalancer.server.port=2283"
-#      - "traefik.docker.network=web"
 
 
 networks:

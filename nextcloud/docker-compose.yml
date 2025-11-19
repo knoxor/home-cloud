@@ -7,10 +7,10 @@ services:
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
-      - MYSQL_ROOT_PASSWORD=W0mq!guyr2t        # <-- keep your real root pwd
+      - MYSQL_ROOT_PASSWORD=myrootpwd        # <-- keep your real root pwd
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
-      - MYSQL_PASSWORD=W0mq!guys3l             # <-- keep your real app pwd
+      - MYSQL_PASSWORD=mysqlpwd             # <-- keep your real app pwd
     volumes:
       - ./db:/var/lib/mysql
     networks:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     environment:
-      - MYSQL_PASSWORD=W0mq!guys3l             # must match above
+      - MYSQL_PASSWORD=mysqlpwd             # must match above
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_HOST=db
@@ -36,7 +36,7 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.nextcloud.rule=Host(`cloud.knoxor.com`)"
+      - "traefik.http.routers.nextcloud.rule=Host(`cloud.mydomain.com`)"
       - "traefik.http.routers.nextcloud.entrypoints=websecure"
       - "traefik.http.routers.nextcloud.tls.certresolver=le"
 
